@@ -7,24 +7,32 @@ import styled from '@emotion/styled'
 
 interface isCompletedProps {
   isShipAtDeparture: boolean;
-  isShipAtDestination: boolean;
+  hasShipReached: boolean;
 }
+interface StatusFiller {
+  showStatusOfTheShip: boolean;
+}
+
 
 type portOfLoading = string;
 type portOfDischarge = string;
 type departureTime = Date;
-type arraivalTime = Date;
+type arrivalTime = Date;
 
 
-const InputWrapper = styled.div`
+const InputWrapper = styled.form`
 padding:2%;
-background-color:#fb6d6d;
-display:flex;
+background-color:#32505e;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(500px,1fr));
+justify-items:center;
 align-items:center;
-justify-content:space-around;
 `
-const InputGroup = styled.div`
-  
+const RenderPorts = styled.div`
+  display:flex;
+  justify-content:space-between;
+  background-color:lightcyan;
+  width:100%;
 `
 
 const Wrapper = styled.div`
@@ -51,7 +59,7 @@ const Pin = styled.div`
   width:50px;
   height:50px;
   transform: translate(0%,0%) rotate(-45deg);
-  border-radius:15% 15% 15% 0%;
+  border-radius:30% 30% 30% 0%;
   @media (max-width: 576px) {
     width:30px;
     height:30px;
@@ -95,7 +103,7 @@ const DotWrapper = styled.div`
 display:grid;
 height:70%;
 width:100%;
-align-items:end;
+align-items:center;
 justify-items:center;
 grid-template-columns:repeat(11,1fr);
 grid-template-rows:minmax(30px,auto);
@@ -103,7 +111,7 @@ grid-template-rows:minmax(30px,auto);
 
 const Port = styled.div<isCompletedProps>`
  
-  background-color: ${props => (props.isShipAtDeparture && props.isShipAtDestination) ? "#253d5e" : "#cabada"} ;
+  background-color: ${props => (props.hasShipReached) ? "#253d5e" : props.isShipAtDeparture ? "#253d5e" : "#cabada"} ;
   width:20px;
   height:20px;
   border-radius:50%;
@@ -116,8 +124,8 @@ const PortGroup = styled.div`
   align-items:center;
 `
 
-const Dot = styled.div`
-  background-color: #cabada;
+const Dot = styled.div<StatusFiller>`
+   background-color: ${props => (props.showStatusOfTheShip) ? "#253d5e" : "#cabada"};
   width:10px;
   height:10px;
   border-radius:50%;
@@ -134,8 +142,27 @@ margin:auto;
   @media (max-width: 576px) {
     height:60%;
       }
-
 `
+
+const Message = styled.p`
+margin:auto;
+text-align:center;
+font-style:italic;
+font-size:20px;
+`
+
+const Label = styled.label`
+margin:1%;
+display:block;
+color:lightcyan;
+`
+
+const ErrorMessage = styled.p`
+  color:red;
+  display:block;
+`
+
+
 const travelDistanceStatusArray: number[] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
 function App() {
@@ -144,14 +171,16 @@ function App() {
   let tomorrow = new Date()
   tomorrow.setDate(today.getDate() + 1)
 
-  const [portOfLoading, setPortOfLoading] = useState<portOfLoading>("Copenhagen");
-  const [portOfDischarge, setPortOfDischarge] = useState<portOfDischarge>("Oslo");
+  const [portOfLoading, setPortOfLoading] = useState<portOfLoading>("");
+  const [portOfDischarge, setPortOfDischarge] = useState<portOfDischarge>("");
   const [departureTime, setDepartureTime] = useState<departureTime>(today)
-  const [arraivalTime, setArraivalTime] = useState<arraivalTime>(today);
-  const [isShipAtDeparture, setIsShipAtDeparture] = useState(true);
-  const [isShipAtDestination, setIsShipAtDestination] = useState(false);
+  const [arrivalTime, setArrivalTime] = useState<arrivalTime>(tomorrow);
+  const [message, setMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [statusOfShip, setStatusOfShip] = useState(0);
 
+  //caluculate time difference
   function timeDiffCalc(dateFuture: number, dateNow: number) {
     let diffInMilliSeconds = Math.abs(dateFuture - dateNow) / 1000;
 
@@ -179,67 +208,91 @@ function App() {
     return { days: days, hours: hours, minutes: minutes };
   }
 
+  //useEffect
   useEffect(() => {
+    console.log("in use effect", today.getTime())
+    let totalTravelTime = timeDiffCalc(arrivalTime.getTime(), departureTime.getTime())
 
-    let totalTravelTime = timeDiffCalc(arraivalTime.getTime(), departureTime.getTime())
+    if (today.getTime() < departureTime.getTime()) {
 
-    if (today.getTime() < departureTime.getTime()) return setStatusOfShip(0)
+      setMessage(`Ship is still at the ${portOfLoading}`);
+
+      return setStatusOfShip(0);
+    }
+    else if (today.getTime() > arrivalTime.getTime()) {
+
+      setMessage(`Ship has already arrived the  ${portOfDischarge}`);
+
+      return setStatusOfShip(100);
+    }
 
     else {
       let diffTilNow;
 
-      diffTilNow = timeDiffCalc(today.getTime(), departureTime.getTime())
+      diffTilNow = timeDiffCalc(today.getTime(), departureTime.getTime());
 
-      if (diffTilNow.days > 1 || diffTilNow.hours > 1) {
-        let timeCompletedtilNowInHours = diffTilNow.days * 24 + diffTilNow.hours
-        let totalHoursTravel = (totalTravelTime.days * 24 + totalTravelTime.hours)
-        setStatusOfShip(() => Math.ceil((timeCompletedtilNowInHours / totalHoursTravel) * 100))
+      if (diffTilNow.days > 1 || diffTilNow.hours > 1 || today.getTime() > departureTime.getTime()) {
+
+        let timeCompletedtilNowInHours = diffTilNow.days * 24 + diffTilNow.hours;
+        let totalHoursTravel = (totalTravelTime.days * 24 + totalTravelTime.hours);
+        setStatusOfShip(() => Math.ceil((timeCompletedtilNowInHours / totalHoursTravel) * 100));
+        setMessage(`Ship is on its way to ${portOfDischarge}`);
       }
-      else
-        setStatusOfShip(0)
+      else {
+        setMessage(`Please enter place and time to see the status.`);
+        setStatusOfShip(0);
+      }
     }
-  }, [departureTime, arraivalTime])
+  }, [departureTime, arrivalTime])
+
 
   return (
     <div >
       <header>
 
         <h1>Voyage progress.</h1>
-        <p>  Please enter the departure and destination and time. </p>
 
         <InputWrapper>
           <div>
-
+            <Label>Please enter port name and time of departure.</Label>
             <input
               value={portOfLoading}
               onChange={(e) => setPortOfLoading(e.target.value)}
-              placeholder="portOfLoading"
+              placeholder="Port name of loading."
               className="input"
+              onBlur={() => !portOfLoading ? setErrorMessage('Please enter the port of loading') : setErrorMessage('')}
             />
             <input
               type="datetime-local"
-              defaultValue={departureTime.toLocaleDateString('en-au')}
+              defaultValue={departureTime.toLocaleTimeString("en-au")}
               onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setDepartureTime(new Date(e.target.value))}
             />
 
           </div>
           <div>
+            <Label>Please enter port name and time of Destination.</Label>
+
             <input
               value={portOfDischarge}
               onChange={(e) => setPortOfDischarge(e.target.value)}
-              placeholder="portOfDischarge"
+              placeholder="Port name of discharge."
+              onBlur={() => !portOfDischarge ? setErrorMessage('Please enter the port of discharge') : setErrorMessage('')}
+
             />
             <input
               type="datetime-local"
-              defaultValue={arraivalTime.toLocaleDateString('en-au')}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setArraivalTime(new Date(e.target.value))}
+              defaultValue={arrivalTime.toLocaleTimeString("en-au")}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setArrivalTime(new Date(e.target.value))}
+              min={departureTime.toLocaleDateString('en-au')}
             />
 
           </div>
+
+          <ErrorMessage>{errorMessage}</ErrorMessage>
         </InputWrapper>
-        {/* <p></p> */}
       </header>
       <Wrapper>
+        <Message>{message}</Message>
         <DotWrapper>
 
           {travelDistanceStatusArray.map((s, i) => {
@@ -253,19 +306,23 @@ function App() {
                     </CircleInsidePin>
                   </Pin>
                 </PinWrapper> : ""}
-              {(i === 0 || i === travelDistanceStatusArray.length - 1) ? <Port isShipAtDeparture={isShipAtDeparture} isShipAtDestination={isShipAtDestination} /> : <Dot />}
+              {(i === 0 || i === travelDistanceStatusArray.length - 1)
+                ? <Port isShipAtDeparture={i === 0 ? true : false} hasShipReached={i === Math.ceil(statusOfShip / 10) ? true : false} />
 
-              {/*  {i===0 && <p>{portOfLoading}</p>}
-              {i===travelDistanceStatusArray.length-1 && <p>{portOfDischarge}</p>} */}
+                : <Dot showStatusOfTheShip={i <= Math.ceil(statusOfShip / 10) ? true : false} />}
+
             </AlignDotsWithPin>
 
           })}
 
-          {/*  <p>{portOfDischarge}</p> */}
+
         </DotWrapper>
+        <RenderPorts>
+          <p>{portOfLoading}</p>
+          <p>{portOfDischarge}</p>
+        </RenderPorts>
 
       </Wrapper>
-
     </div>
   );
 }
