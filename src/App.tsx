@@ -24,7 +24,7 @@ const InputWrapper = styled.form`
 padding:2%;
 background-color:#32505e;
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(500px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
 justify-items:center;
 align-items:center;
 `
@@ -32,7 +32,8 @@ const RenderPorts = styled.div`
   display:flex;
   justify-content:space-between;
   background-color:lightcyan;
-  width:100%;
+  width:70%;
+  padding:0 15%;
 `
 
 const Wrapper = styled.div`
@@ -102,12 +103,18 @@ const DotWrapper = styled.div`
 
 display:grid;
 height:70%;
-width:100%;
+width:70%;
 align-items:center;
 justify-items:center;
 grid-template-columns:repeat(11,1fr);
 grid-template-rows:minmax(30px,auto);
+padding:0 15%;
 `
+
+/* const PortInputs = styled.section`
+  display:flex;
+  flex-wrap:wrap;
+` */
 
 const Port = styled.div<isCompletedProps>`
  
@@ -171,12 +178,14 @@ function App() {
   let tomorrow = new Date()
   tomorrow.setDate(today.getDate() + 1)
 
-  const [portOfLoading, setPortOfLoading] = useState<portOfLoading>("");
-  const [portOfDischarge, setPortOfDischarge] = useState<portOfDischarge>("");
+  const [portOfLoading, setPortOfLoading] = useState<portOfLoading>("Copenhagen");
+  const [portOfDischarge, setPortOfDischarge] = useState<portOfDischarge>("Oslo");
   const [departureTime, setDepartureTime] = useState<departureTime>(today)
   const [arrivalTime, setArrivalTime] = useState<arrivalTime>(tomorrow);
   const [message, setMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState({
+    loadingErrorMessage: "", dischargeErrorMessage: ""
+  });
 
   const [statusOfShip, setStatusOfShip] = useState(0);
 
@@ -210,9 +219,9 @@ function App() {
 
   //useEffect
   useEffect(() => {
-    console.log("in use effect", today.getTime())
-    let totalTravelTime = timeDiffCalc(arrivalTime.getTime(), departureTime.getTime())
 
+    let totalTravelTime = timeDiffCalc(arrivalTime.getTime(), departureTime.getTime())
+    console.log("totalTravelTime", totalTravelTime)
     if (today.getTime() < departureTime.getTime()) {
 
       setMessage(`Ship is still at the ${portOfLoading}`);
@@ -226,31 +235,32 @@ function App() {
       return setStatusOfShip(100);
     }
 
-    else {
+    else if (departureTime.getTime() < arrivalTime.getTime()) {
       let diffTilNow;
-
       diffTilNow = timeDiffCalc(today.getTime(), departureTime.getTime());
+      let timeCompletedtilNowInMinutes = diffTilNow.days * 24 * 60 + diffTilNow.hours * 60 + diffTilNow.minutes;
+      let totalHoursTravel = (totalTravelTime.days * 24 * 60 + totalTravelTime.hours * 60 + totalTravelTime.minutes);
 
-      
-if(today.getTime() > departureTime.getTime()){
-       
-        if (diffTilNow.days > 1 || diffTilNow.hours > 1) {
-        let timeCompletedtilNowInHours = diffTilNow.days * 24 + diffTilNow.hours;
-        let totalHoursTravel = (totalTravelTime.days * 24 + totalTravelTime.hours);
-        setStatusOfShip(() => Math.ceil((timeCompletedtilNowInHours / totalHoursTravel) * 100));
+      console.log("checking", diffTilNow)
+      if (diffTilNow.days >= 1 || diffTilNow.hours >= 1 || diffTilNow.minutes > 30) {
+        console.log("diff til now", diffTilNow);
+        setStatusOfShip(() => Math.ceil((timeCompletedtilNowInMinutes / totalHoursTravel) * 100));
         setMessage(`Ship is on its way to ${portOfDischarge}`);
-        }
-        else  if(diffTilNow.minutes > 1)
-        {
-          setMessage(`Ship just started from ${portOfLoading}.`);
-          setStatusOfShip(0);
-        }
-      else {
-        setMessage(`Please enter place and time to see the status.`);
-        setStatusOfShip(0);
       }
+      if (diffTilNow.days < 1 && diffTilNow.hours < 1 && diffTilNow.minutes > 1 && diffTilNow.minutes <= 30) {
+        console.log("diff til now", diffTilNow);
+        setMessage(`Ship just started from ${portOfLoading}.(~<30min.)`);
+        setStatusOfShip(() => Math.ceil((timeCompletedtilNowInMinutes / totalHoursTravel) * 100));
+
+      }
+
     }
-  }
+    else {
+      setMessage(`Please enter place and time to see the status.`);
+      setStatusOfShip(0);
+    }
+
+
   }, [departureTime, arrivalTime])
 
 
@@ -262,13 +272,15 @@ if(today.getTime() > departureTime.getTime()){
 
         <InputWrapper>
           <div>
-            <Label>Please enter port name and time of departure.</Label>
+
+            <Label>Please enter port name and time of departure. </Label>
+
             <input
               value={portOfLoading}
               onChange={(e) => setPortOfLoading(e.target.value)}
               placeholder="Port name of loading."
               className="input"
-              onBlur={() => !portOfLoading ? setErrorMessage('Please enter the port of loading') : setErrorMessage('')}
+              onBlur={() => !portOfLoading ? setErrorMessage({ ...errorMessage, loadingErrorMessage: 'Please enter the port of loading' }) : setErrorMessage({ ...errorMessage, loadingErrorMessage: '' })}
             />
             <input
               type="datetime-local"
@@ -276,15 +288,18 @@ if(today.getTime() > departureTime.getTime()){
               onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setDepartureTime(new Date(e.target.value))}
             />
 
+
+            <ErrorMessage>{!portOfLoading && errorMessage.loadingErrorMessage}</ErrorMessage>
           </div>
           <div>
-            <Label>Please enter port name and time of Destination.</Label>
+
+            <Label>Please enter port name and time of Arrival. </Label>
 
             <input
               value={portOfDischarge}
               onChange={(e) => setPortOfDischarge(e.target.value)}
               placeholder="Port name of discharge."
-              onBlur={() => !portOfDischarge ? setErrorMessage('Please enter the port of discharge') : setErrorMessage('')}
+              onBlur={() => !portOfDischarge ? setErrorMessage({ ...errorMessage, dischargeErrorMessage: 'Please enter the port of discharge' }) : setErrorMessage({ ...errorMessage, dischargeErrorMessage: '' })}
 
             />
             <input
@@ -294,9 +309,12 @@ if(today.getTime() > departureTime.getTime()){
               min={departureTime.toLocaleDateString('en-au')}
             />
 
+
+            <ErrorMessage>{!portOfDischarge && errorMessage.dischargeErrorMessage}</ErrorMessage>
           </div>
 
-          <ErrorMessage>{errorMessage}</ErrorMessage>
+
+
         </InputWrapper>
       </header>
       <Wrapper>
@@ -325,9 +343,9 @@ if(today.getTime() > departureTime.getTime()){
 
 
         </DotWrapper>
-        <RenderPorts>
-          <p>{portOfLoading}</p>
-          <p>{portOfDischarge}</p>
+        <RenderPorts data-testid="renderPorts">
+          <p data-testid="renderPort1">{portOfLoading}</p>
+          <p data-testid="renderPort2">{portOfDischarge}</p>
         </RenderPorts>
 
       </Wrapper>
