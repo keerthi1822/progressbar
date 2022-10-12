@@ -231,18 +231,26 @@ function App() {
 
       diffTilNow = timeDiffCalc(today.getTime(), departureTime.getTime());
 
-      if (diffTilNow.days > 1 || diffTilNow.hours > 1 || today.getTime() > departureTime.getTime()) {
-
+      
+if(today.getTime() > departureTime.getTime()){
+       
+        if (diffTilNow.days > 1 || diffTilNow.hours > 1) {
         let timeCompletedtilNowInHours = diffTilNow.days * 24 + diffTilNow.hours;
         let totalHoursTravel = (totalTravelTime.days * 24 + totalTravelTime.hours);
         setStatusOfShip(() => Math.ceil((timeCompletedtilNowInHours / totalHoursTravel) * 100));
         setMessage(`Ship is on its way to ${portOfDischarge}`);
-      }
+        }
+        else  if(diffTilNow.minutes > 1)
+        {
+          setMessage(`Ship just started from ${portOfLoading}.`);
+          setStatusOfShip(0);
+        }
       else {
         setMessage(`Please enter place and time to see the status.`);
         setStatusOfShip(0);
       }
     }
+  }
   }, [departureTime, arrivalTime])
 
 
