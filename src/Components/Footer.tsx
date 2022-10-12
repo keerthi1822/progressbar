@@ -2,11 +2,14 @@ import React from "react";
 import styled from '@emotion/styled'
 
 const AboutMeSection = styled.footer`
+background-color:lightcyan;
+position: absolute;
+bottom:0;
     display:flex;
     margin:auto;
     width:80%;
-    background-color:lightcyan;
     justify-content:space-around;
+    align-items:flex-end;
     padding: 1% 10%;
     
 `
@@ -14,7 +17,7 @@ const AboutMeSection = styled.footer`
 const Footer = () => {
   return (
     <>
-      <AboutMeSection className="social_icons">
+      <AboutMeSection>
         <a
           href="https://www.linkedin.com/in/keerthi-alampalli-002750152/"
           target="_blank"

@@ -4,6 +4,9 @@
 
 import { useState, useEffect } from 'react';
 import styled from '@emotion/styled'
+import Footer from './Components/Footer'
+import background from './Components/dfdsShip.jpg'
+
 
 interface isCompletedProps {
   isShipAtDeparture: boolean;
@@ -124,13 +127,6 @@ const Port = styled.div<isCompletedProps>`
   border-radius:50%;
 `
 
-const PortGroup = styled.div`
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-`
-
 const Dot = styled.div<StatusFiller>`
    background-color: ${props => (props.showStatusOfTheShip) ? "#253d5e" : "#cabada"};
   width:10px;
@@ -161,7 +157,7 @@ font-size:20px;
 const Label = styled.label`
 margin:1%;
 display:block;
-color:lightcyan;
+color:white;
 `
 
 const ErrorMessage = styled.p`
@@ -169,6 +165,19 @@ const ErrorMessage = styled.p`
   display:block;
 `
 
+const Background = styled.div`
+height:100vh;
+`
+
+const H1 = styled.h1`
+  color:#253d5e;
+  text-align:center;
+`
+const ShipImage = styled.div`
+width:100vh;
+height:300px;
+background: url(${background}) norepeat;
+`
 
 const travelDistanceStatusArray: number[] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
@@ -221,7 +230,6 @@ function App() {
   useEffect(() => {
 
     let totalTravelTime = timeDiffCalc(arrivalTime.getTime(), departureTime.getTime())
-    console.log("totalTravelTime", totalTravelTime)
     if (today.getTime() < departureTime.getTime()) {
 
       setMessage(`Ship is still at the ${portOfLoading}`);
@@ -243,12 +251,10 @@ function App() {
 
       console.log("checking", diffTilNow)
       if (diffTilNow.days >= 1 || diffTilNow.hours >= 1 || diffTilNow.minutes > 30) {
-        console.log("diff til now", diffTilNow);
         setStatusOfShip(() => Math.ceil((timeCompletedtilNowInMinutes / totalHoursTravel) * 100));
         setMessage(`Ship is on its way to ${portOfDischarge}`);
       }
       if (diffTilNow.days < 1 && diffTilNow.hours < 1 && diffTilNow.minutes > 1 && diffTilNow.minutes <= 30) {
-        console.log("diff til now", diffTilNow);
         setMessage(`Ship just started from ${portOfLoading}.(~<30min.)`);
         setStatusOfShip(() => Math.ceil((timeCompletedtilNowInMinutes / totalHoursTravel) * 100));
 
@@ -265,15 +271,16 @@ function App() {
 
 
   return (
-    <div >
+  
+      <Background>
       <header>
 
-        <h1>Voyage progress.</h1>
+        <H1>Voyage progress.</H1>
 
         <InputWrapper>
           <div>
 
-            <Label>Please enter port name and time of departure. </Label>
+            <Label>Enter port name and time of departure. </Label>
 
             <input
               value={portOfLoading}
@@ -293,7 +300,7 @@ function App() {
           </div>
           <div>
 
-            <Label>Please enter port name and time of Arrival. </Label>
+            <Label>Enter port name and time of Arrival. </Label>
 
             <input
               value={portOfDischarge}
@@ -308,8 +315,6 @@ function App() {
               onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setArrivalTime(new Date(e.target.value))}
               min={departureTime.toLocaleDateString('en-au')}
             />
-
-
             <ErrorMessage>{!portOfDischarge && errorMessage.dischargeErrorMessage}</ErrorMessage>
           </div>
 
@@ -349,7 +354,10 @@ function App() {
         </RenderPorts>
 
       </Wrapper>
-    </div>
+      <ShipImage/>
+      <Footer/>
+      </Background>
+   
   );
 }
 
