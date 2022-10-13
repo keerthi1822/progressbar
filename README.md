@@ -7,7 +7,7 @@ Inputs: Port of loading,
         
 Progress bar: 
         design:
-            pin - nearly
+            pin - nearly done,
             Ports and dots - done
         
         Functionality:
