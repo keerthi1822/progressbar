@@ -1,46 +1,28 @@
-# Getting Started with Create React App
+Implemented taskes:
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+Inputs: Port of loading,
+        port of discharge,
+        Date and time of loading,
+        date and time of discharge
+        
+Progress bar: 
+        design:
+            pin - nearly
+            Ports and dots - done
+        
+        Functionality:
+            working as it should be.
+            Color and pin changes on status update of date and time.
+            
+ How to run the project?
+ 1. Please clone the project to your local computer use ' git clone https://github.com/keerthi1822/progressbar.git ' in your CLI.
+ 2. Navigate to the right folder using 'cd progressbar'.
+ 3. run 'npm install' to install all the packages used in the project.
+ 4. Now it is time to see the output of the project by running the command 'npm start'. then you notice a browser tab poping up with the url : localhost:3000 and this is     the view/ web page for the project. Please test and observe the progress bar with different inputs.
+ 
+ Not implemented tasks:
+ 1. Tests
+ 
+ 
+ 
+            
