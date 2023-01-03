@@ -27,8 +27,8 @@ function App() {
   let tomorrow = new Date()
   tomorrow.setDate(today.getDate() + 1)
 
-  const [portOfLoading, setPortOfLoading] = useState<portOfLoading>("");
-  const [portOfDischarge, setPortOfDischarge] = useState<portOfDischarge>("");
+  const [portOfLoading, setPortOfLoading] = useState<portOfLoading>("India");
+  const [portOfDischarge, setPortOfDischarge] = useState<portOfDischarge>("Egypt");
   const [departureTime, setDepartureTime] = useState<departureTime>(today)
   const [arrivalTime, setArrivalTime] = useState<arrivalTime>(tomorrow);
   const [message, setMessage] = useState("");
@@ -136,7 +136,7 @@ function App() {
         message={message}
         portOfLoading={portOfLoading}
         portOfDischarge={portOfDischarge} />
-        <img src={background} alt="ship img" width={1600} height={250}/>
+        <img src={background} alt="ship img" width={1536} height={240}/>
    
       <Footer />
     </div>
